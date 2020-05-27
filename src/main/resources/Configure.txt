@@ -1,0 +1,9 @@
+# The path to the folder where the save files are located.
+SavePath=C:\Users\troxbanv\AppData\Local\Remnant\Saved\SaveGames
+
+# The file you would like to default to, if you want to choose from a menu comment the next line with a #.
+DefaultFile=save_1.sav
+
+# The default analyzation type, can be All, Campaign or Adventure.  If you want to choose from a menu comment
+# the next line with a #.
+DefaultType=Adventure
