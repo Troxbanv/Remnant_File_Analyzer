@@ -1,4 +1,5 @@
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Reader {
@@ -9,18 +10,15 @@ public class Reader {
 
     public Reader(File saveFile) {
         this.saveFile = saveFile;
-/*
-        subSections = new FileCommands("C:\\Users\\troxbanv\\IdeaProjects\\Remnant\\src\\main\\resources\\SubLocations.txt");
-        eventsFix = new FileCommands("C:\\Users\\troxbanv\\IdeaProjects\\Remnant\\src\\main\\resources\\Events.txt");
-*/
-        subSections = new FileCommands(".\\SubLocations.txt");
-        eventsFix = new FileCommands(".\\Events.txt");
+
+        subSections = new FileCommands(Paths.get("resources/SubLocations.txt").toAbsolutePath().toString());
+        eventsFix = new FileCommands(Paths.get("resources/Events.txt").toAbsolutePath().toString());
     }
 
-    public HashMap<GameType, String> readFile() {
+    public HashMap<GameType, ArrayList<Event>> readFile() {
 
         LinkedHashMap<Integer, String> myMap = new LinkedHashMap<>();
-        HashMap<GameType, String> result = new HashMap<>();
+        HashMap<GameType, ArrayList<Event>> result = new HashMap<>();
 
         String fileContent = "";
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(saveFile))) {
@@ -55,8 +53,11 @@ public class Reader {
                     camLocation = string.getValue().indexOf("/Game/Campaign_Main/Quest_Campaign");
 
                     if(camLocation < camMinCount) {
-                        result.put(GameType.CAMPAIGN, string.getValue());
-                        camMinCount = camLocation;
+                        ArrayList<Event> found = findThings(string.getValue());
+                        if(!found.isEmpty()) {
+                            result.put(GameType.CAMPAIGN, found);
+                            camMinCount = camLocation;
+                        }
                     }
                 }
             }
@@ -66,23 +67,22 @@ public class Reader {
                     advlocation = string.getValue().indexOf("Quest_AdventureMode");
 
                     if(advlocation < advminCount) {
-                        result.put(GameType.ADVENTURE, string.getValue());
-                        advminCount = advlocation;
+                        ArrayList<Event> found = findThings(string.getValue());
+                        if(!found.isEmpty()) {
+                            result.put(GameType.ADVENTURE, found);
+                            advminCount = advlocation;
+                        }
                     }
                 }
             }
-
-//            System.out.println("Count: " + location);
-//            System.out.println("Line No: " + string.getKey());
-//            System.out.println("Line: " + string.getValue());
         }
 
         return result;
     }
 
-    public void findThings(String string) {
+    public ArrayList<Event> findThings(String string) {
 
-        ArrayList<event> events = new ArrayList<>();
+        ArrayList<Event> events = new ArrayList<>();
         String test[] = string.split("/Game");
 
         for(String current : test) {
@@ -102,6 +102,10 @@ public class Reader {
                 world = "Yaesha";
             } else if (current.contains("World_Swamp")) {
                 world = "Corsus";
+            }
+
+            if(world.equals("")) {
+                continue;
             }
 
             if (current.contains("SmallD")) {
@@ -141,77 +145,25 @@ public class Reader {
             }
 
             if(!eventType.equals("")) {
-                events.add(new event(world, eventType, eventName, fixedName, location, inSmallDungeon));
+                events.add(new Event(world, eventType, eventName, fixedName, location, inSmallDungeon));
             }
         }
 
         events = eliminateDuplicates(events);
 
-        for(event cur : events) {
-             cur.print();
-        }
-
-        String stop = "";
+        return events;
     }
 
-    private ArrayList<event> eliminateDuplicates(ArrayList<event> list) {
+    private ArrayList<Event> eliminateDuplicates(ArrayList<Event> list) {
 
-        ArrayList<event> result = new ArrayList<>();
+        ArrayList<Event> result = new ArrayList<>();
 
-        for(event current : list) {
+        for(Event current : list) {
             if(!result.contains(current)) {
                 result.add(current);
             }
         }
 
         return result;
-    }
-
-    private class event {
-
-        public String world;
-        public String eventType;
-        public String eventName;
-        public String fixedName;
-        public String location;
-        public boolean smallDungeon;
-
-        public event(String world, String eventType, String eventName, String fixedName, String location, boolean smallDungeon) {
-            this.world = world;
-            this.eventType = eventType;
-            this.eventName = eventName;
-            this.fixedName = fixedName;
-            this.location = location;
-            this.smallDungeon = smallDungeon;
-        }
-
-        public void print() {
-            System.out.println("World: " + world);
-            System.out.println("Event Type: " + eventType);
-            System.out.println("Event Name: " + eventName);
-            System.out.println("Fixed Name: " + fixedName);
-            System.out.println("Location: " + location);
-            System.out.println("Small Dungeon: " + smallDungeon);
-            System.out.println();
-            System.out.println();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            event event = (event) o;
-            return smallDungeon == event.smallDungeon &&
-                    Objects.equals(world, event.world) &&
-                    Objects.equals(eventType, event.eventType) &&
-                    Objects.equals(eventName, event.eventName) &&
-                    Objects.equals(fixedName, event.fixedName) &&
-                    Objects.equals(location, event.location);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(world, eventType, eventName, fixedName, location, smallDungeon);
-        }
     }
 }
