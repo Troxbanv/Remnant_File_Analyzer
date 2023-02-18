@@ -1,13 +1,15 @@
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class GetFiles {
 
-    private static String configurationPath = ".\\Configure.txt";
-//    private static String configurationPath = "C:\\Users\\troxbanv\\IdeaProjects\\Remnant\\src\\main\\resources\\Configure.txt";
-
     public static HashMap<Configuration_Items, String> getSaveFilePath() {
+
+        String configurationPath = Paths.get("resources/Configure.txt").toAbsolutePath().toString();
+
+        System.out.println(configurationPath);
 
         HashMap<Configuration_Items, String> result = new HashMap<>();
 
