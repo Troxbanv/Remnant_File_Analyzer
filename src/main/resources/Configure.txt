@@ -6,4 +6,4 @@ DefaultFile=save_1.sav
 
 # The default analyzation type, can be All, Campaign or Adventure.  If you want to choose from a menu comment
 # the next line with a #.
-DefaultType=Adventure
+DefaultType=All

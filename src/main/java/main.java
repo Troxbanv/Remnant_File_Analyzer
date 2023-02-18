@@ -1,4 +1,5 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -23,12 +24,14 @@ public class main {
 
         Reader reader = new Reader(new File(path));
 
-        HashMap<GameType, String> world = reader.readFile();
+        HashMap<GameType, ArrayList<Event>> world = reader.readFile();
 
         if(choice.equalsIgnoreCase("All") || choice.equalsIgnoreCase("Campaign")) {
             System.out.println("Campaign Items");
             System.out.println();
-            reader.findThings(world.get(GameType.CAMPAIGN));
+            for(Event event : world.get(GameType.CAMPAIGN)) {
+                event.print();
+            }
             System.out.println();
             System.out.println();
         }
@@ -36,7 +39,9 @@ public class main {
         if(choice.equalsIgnoreCase("All") || choice.equalsIgnoreCase("Adventure")) {
             System.out.println("Adventure Items");
             System.out.println();
-            reader.findThings(world.get(GameType.ADVENTURE));
+            for(Event event : world.get(GameType.ADVENTURE)) {
+                event.print();
+            }
         }
     }
 }
